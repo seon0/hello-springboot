@@ -13,6 +13,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class HelloController {
 	
+	/*
+	 * @RequiredArgsConstructor
+	 * 생성자 자동 생성
+	 */
+	
 	private final HelloService helloService;
 
 	@GetMapping("/hello")
