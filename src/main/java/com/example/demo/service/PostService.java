@@ -9,14 +9,23 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.PostRequestDto;
 import com.example.demo.dto.PostResponseDto;
+import com.example.demo.entity.Post;
+import com.example.demo.repository.PostRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
 	
+	private final PostRepository postRepository;
+	/*
 	private Map<Long, PostResponseDto> store = new HashMap<>();
 	private Long sequence = 1L;
+	*/
 	
 	public PostResponseDto createPost(PostRequestDto requestDto) {
+		/*
 		PostResponseDto post = new PostResponseDto(
 				sequence, 
 				requestDto.getTitle(), 
@@ -24,30 +33,46 @@ public class PostService {
 		);
 		store.put(sequence, post);
 		sequence++;
+		*/
+		Post post = new Post();
+		post.setTitle(requestDto.getTitle());
+		post.setContent(requestDto.getContent());
 		
-		return post;
+		Post saved = postRepository.save(post);
+		
+		return new PostResponseDto(saved.getId(), saved.getTitle(), saved.getContent());
 	}
 	
-	public List<PostResponseDto> getAllPost() {
-		return new ArrayList<>(store.values());
+	// READ ALL
+	public List<Post> getAllPost() {
+//		return new ArrayList<>(store.values());
+		return postRepository.findAll();
 	}
 	
-	public PostResponseDto getPostById(Long id) {
-		return store.get(id);
+	// READ ONE
+	public Post getPostById(Long id) {
+//		return store.get(id);
+		return postRepository.findById(id).orElse(null);
 	}
 	
+	//UPDATE
 	public PostResponseDto updatePost(Long id, PostRequestDto requestDto) {
-		PostResponseDto existing = store.get(id);
+//		PostResponseDto existing = store.get(id);
+		Post existing = postRepository.findById(id).orElse(null);
 		if( existing == null ) 
 			return null;
 		
 		existing.setTitle(requestDto.getTitle());
 		existing.setContent(requestDto.getContent());
-		return existing;
+		
+		Post updated = postRepository.save(existing);
+		return new PostResponseDto(updated.getId(), updated.getTitle(), updated.getContent());
 	}
 	
+	//DELETE
 	public void deletePost(Long id) {
-		store.remove(id);
+//		store.remove(id);
+		postRepository.deleteById(id);
 	}
 
 }

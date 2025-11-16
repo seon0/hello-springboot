@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.PostRequestDto;
 import com.example.demo.dto.PostResponseDto;
+import com.example.demo.entity.Post;
 import com.example.demo.service.PostService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,12 +32,12 @@ public class PostController {
 	}
 	
 	@GetMapping
-	public List<PostResponseDto> findAll() {
+	public List<Post> findAll() {
 		return postService.getAllPost();
 	}
 	
 	@GetMapping("/{id}")
-	public PostResponseDto findOne(@PathVariable Long id) {
+	public Post findOne(@PathVariable Long id) {
 		return postService.getPostById(id);
 	}
 	
