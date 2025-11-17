@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.PostRequestDto;
@@ -73,6 +75,14 @@ public class PostService {
 	public void deletePost(Long id) {
 //		store.remove(id);
 		postRepository.deleteById(id);
+	}
+	
+	public Page<Post>getPosts(Pageable pageable) {
+		return postRepository.findAll(pageable);
+	}
+	
+	public List<Post> searchByTitle(String keyword) {
+		return postRepository.findByTitleContaining(keyword);
 	}
 
 }
