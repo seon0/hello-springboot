@@ -1,9 +1,9 @@
 package com.example.demo.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+//import java.util.ArrayList;
+//import java.util.HashMap;
+//import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +26,7 @@ public class PostService {
 	private Long sequence = 1L;
 	*/
 	
-	public PostResponseDto createPost(PostRequestDto requestDto) {
+	public Post createPost(PostRequestDto requestDto) {
 		/*
 		PostResponseDto post = new PostResponseDto(
 				sequence, 
@@ -42,7 +42,7 @@ public class PostService {
 		
 		Post saved = postRepository.save(post);
 		
-		return new PostResponseDto(saved.getId(), saved.getTitle(), saved.getContent());
+		return saved;
 	}
 	
 	// READ ALL

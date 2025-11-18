@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.PostRequestDto;
 import com.example.demo.dto.PostResponseDto;
+import com.example.demo.dto.ResponseDto;
 import com.example.demo.entity.Post;
 import com.example.demo.service.PostService;
 
@@ -29,19 +30,21 @@ public class PostController {
 	private final PostService postService;
 	
 	
-	@PostMapping
-	public PostResponseDto create(@RequestBody PostRequestDto requestDto) {
-		return postService.createPost(requestDto);
-	}
-	
 	@GetMapping
 	public List<Post> findAll() {
 		return postService.getAllPost();
 	}
 	
 	@GetMapping("/{id}")
-	public Post findOne(@PathVariable Long id) {
-		return postService.getPostById(id);
+	public ResponseDto<?> findOne(@PathVariable Long id) {
+		Post post = postService.getPostById(id);
+		return post != null ? ResponseDto.success(post) : ResponseDto.fail("해당 ID를 찾을 수 없습니다.");
+	}
+	
+	@PostMapping
+	public ResponseDto<?> create(@RequestBody PostRequestDto requestDto) {
+		Post saved = postService.createPost(requestDto);
+		return ResponseDto.success(saved);
 	}
 	
 	@PutMapping("/{id}")
@@ -50,9 +53,9 @@ public class PostController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public String delete(@PathVariable Long id) {
+	public ResponseDto<?> delete(@PathVariable Long id) {
 		postService.deletePost(id);
-		return "deleted";
+		return ResponseDto.success("삭제완료");
 	}
 	
 	
