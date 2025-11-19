@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.PostRequestDto;
 import com.example.demo.dto.PostResponseDto;
+import com.example.demo.dto.request.PostCreateRequest;
+import com.example.demo.dto.request.PostUpdateRequest;
+import com.example.demo.dto.response.PostResponse;
 import com.example.demo.entity.Post;
 import com.example.demo.repository.PostRepository;
 
@@ -26,7 +29,8 @@ public class PostService {
 	private Long sequence = 1L;
 	*/
 	
-	public Post createPost(PostRequestDto requestDto) {
+//	public Post createPost(PostRequestDto requestDto) {
+	public PostResponse create(PostCreateRequest request) {
 		/*
 		PostResponseDto post = new PostResponseDto(
 				sequence, 
@@ -37,12 +41,13 @@ public class PostService {
 		sequence++;
 		*/
 		Post post = new Post();
-		post.setTitle(requestDto.getTitle());
-		post.setContent(requestDto.getContent());
+		post.setTitle(request.getTitle());
+		post.setContent(request.getContent());
 		
 		Post saved = postRepository.save(post);
 		
-		return saved;
+//		return saved;
+		return new PostResponse(post);
 	}
 	
 	// READ ALL
@@ -58,17 +63,21 @@ public class PostService {
 	}
 	
 	//UPDATE
-	public PostResponseDto updatePost(Long id, PostRequestDto requestDto) {
+//	public PostResponseDto updatePost(Long id, PostRequestDto requestDto) {
+	public PostResponse update(Long id, PostUpdateRequest request) {
 //		PostResponseDto existing = store.get(id);
-		Post existing = postRepository.findById(id).orElse(null);
-		if( existing == null ) 
-			return null;
+		Post existing = postRepository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID"));
+//				.orElse(null);
+//		if( existing == null ) 
+//			return null;
 		
-		existing.setTitle(requestDto.getTitle());
-		existing.setContent(requestDto.getContent());
+		existing.setTitle(request.getTitle());
+		existing.setContent(request.getContent());
 		
-		Post updated = postRepository.save(existing);
-		return new PostResponseDto(updated.getId(), updated.getTitle(), updated.getContent());
+//		Post updated = postRepository.save(existing);
+//		return new PostResponseDto(updated.getId(), updated.getTitle(), updated.getContent());
+		return new PostResponse(postRepository.save(existing));
 	}
 	
 	//DELETE

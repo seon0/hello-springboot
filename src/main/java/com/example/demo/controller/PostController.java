@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.dto.PostRequestDto;
 import com.example.demo.dto.PostResponseDto;
 import com.example.demo.dto.ResponseDto;
+import com.example.demo.dto.request.PostCreateRequest;
+import com.example.demo.dto.request.PostUpdateRequest;
 import com.example.demo.entity.Post;
 import com.example.demo.service.PostService;
 
@@ -42,14 +44,16 @@ public class PostController {
 	}
 	
 	@PostMapping
-	public ResponseDto<?> create(@RequestBody PostRequestDto requestDto) {
-		Post saved = postService.createPost(requestDto);
-		return ResponseDto.success(saved);
+	public ResponseDto<?> create(@RequestBody PostCreateRequest request) {
+//		Post saved = postService.createPost(requestDto);
+//		return ResponseDto.success(saved);
+		return ResponseDto.success(postService.create(request));
 	}
 	
 	@PutMapping("/{id}")
-	public PostResponseDto update(@PathVariable Long id, @RequestBody PostRequestDto requestDto) {
-		return postService.updatePost(id, requestDto);
+	public ResponseDto<?> update(@PathVariable Long id, @RequestBody PostUpdateRequest request) {
+//		return postService.updatePost(id, requestDto);
+		return ResponseDto.success(postService.update(id, request));
 	}
 	
 	@DeleteMapping("/{id}")
