@@ -1,9 +1,11 @@
 package com.example.demo.exception;
 
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.example.demo.dto.ResponseDto;
+import com.example.demo.global.exception.CustomException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -21,7 +23,19 @@ public class GlobalExceptionHandler { // 전역적으로 예외 발생 시 handl
 			return null;
 		}
 		
+		return ResponseDto.fail("서버 오류:" + e.getMessage());
+	}
+	
+	
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseDto<?> handleValidationException(MethodArgumentNotValidException e) {
+		String msg = e.getBindingResult().getFieldError().getDefaultMessage();
+		return ResponseDto.fail(msg);
+	}
+	
+	@ExceptionHandler(CustomException.class)
+	public ResponseDto<?> handleCustomException(CustomException e) {
 		return ResponseDto.fail(e.getMessage());
 	}
-
+	
 }
