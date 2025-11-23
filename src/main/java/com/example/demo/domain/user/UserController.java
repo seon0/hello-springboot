@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.domain.user.dto.UserLoginRequest;
 import com.example.demo.domain.user.dto.UserRegisterRequest;
 import com.example.demo.dto.ResponseDto;
 
@@ -22,6 +23,12 @@ public class UserController {
 	public ResponseDto<?> register(@Valid @RequestBody UserRegisterRequest req)  {
 		System.out.println("register:: email- "+req.getEmail() + ", name:" + req.getName());
 		return ResponseDto.success(userService.register(req));
+	}
+	
+	@PostMapping("/login")
+	public ResponseDto<?> login(@Valid @RequestBody UserLoginRequest req) {
+		String token = userService.login(req);
+		return ResponseDto.success(token);
 	}
 
 }
