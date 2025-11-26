@@ -27,8 +27,9 @@ public class JwtAuthFilter extends OncePerRequestFilter{
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		String header = request.getHeader("Authorization");
+		System.out.println("[JwtAuthFilter - doFilterUnternal] header : " + header);
 		
-		if ( header != null && header.startsWith("Bearer") ) {
+		if ( header != null && header.startsWith("Bearer ") ) {
 			String token = header.substring(7);
 			
 			try {

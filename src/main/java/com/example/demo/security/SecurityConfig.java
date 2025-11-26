@@ -1,7 +1,7 @@
 package com.example.demo.security;
 
 import com.example.demo.security.jwt.JwtAuthFilter;
-import com.example.demo.security.jwt.JwtTokenProvider;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,16 +14,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-//    private final JwtTokenProvider jwtTokenProvider;
 	private final JwtAuthFilter jwtAuthFilter;
 	
 
 	public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
 		this.jwtAuthFilter = jwtAuthFilter;
 	}
-//    public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
-//        this.jwtTokenProvider = jwtTokenProvider;
-//    }
 	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -35,9 +31,12 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers(
 								// swagger 허용
-								"/v3/api-docs/**)",
+								"/v3/api-docs",
+								"/v3/api-docs/**",
 								"/swagger-ui/**",
 								"/swagger-resources/**",
+								"/swagger-resources",
+//								"/webjars/**",
 								"/swagger-ui.html"
 						).permitAll()
 						// 로그인/회원가입 허용
