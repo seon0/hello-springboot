@@ -19,7 +19,8 @@ public class GlobalExceptionHandler { // 전역적으로 예외 발생 시 handl
 		
 		if ( uri.startsWith("/v3/api-docs") || 
 				uri.startsWith("/swagger-ui") || 
-				uri.startsWith("/swagger-resources") ) {
+				uri.startsWith("/swagger-resources") || 
+				uri.startsWith("/h2-console") ) {
 			return null;
 		}
 		

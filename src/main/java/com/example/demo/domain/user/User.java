@@ -46,7 +46,7 @@ public class User {
 	private String password;
 	
 	@Column(nullable = false, length = 30)
-	private String name;
+	private String username;
 	
 	
 	@ManyToMany(fetch = FetchType.EAGER)

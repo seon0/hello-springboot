@@ -32,7 +32,7 @@ public class RoleInitConfig implements ApplicationRunner {
 		User user = User.builder()
 				.email("test@gmail.com")
 				.password(passwordEncoder.encode("pass"))
-				.name("기본 유저")
+				.username("기본 유저")
 				.roles(Set.of(role))
 				.build();
 		
