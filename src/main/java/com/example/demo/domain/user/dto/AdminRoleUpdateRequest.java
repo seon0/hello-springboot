@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 public class AdminRoleUpdateRequest {
 
-	private List<String> roles; // ["ROLE_USER", "USER_ADMIN"]
+	private List<String> roles; // ["ROLE_USER", "ROLE_ADMIN"]
 	
 }

@@ -5,8 +5,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.basic.dto.ResponseDto;
 import com.example.demo.domain.user.dto.AdminRoleUpdateRequest;
-import com.example.demo.dto.ResponseDto;
+import com.example.demo.domain.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 

@@ -1,0 +1,56 @@
+package com.example.demo.domain.role.init;
+
+import java.util.Set;
+
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.example.demo.domain.role.entity.Role;
+import com.example.demo.domain.role.repositoty.RoleRepository;
+import com.example.demo.domain.user.entity.User;
+import com.example.demo.domain.user.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Configuration
+@RequiredArgsConstructor
+public class RoleInitConfig implements ApplicationRunner {
+
+	private final RoleRepository roleRepository;
+
+	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
+
+	@Override
+	@Transactional
+	public void run(ApplicationArguments args) throws Exception {
+		createRole("ROLE_USER");
+		createRole("ROLE_ADMIN");
+		Role role = new Role(1L, "ROLE_USER");
+		User user = User.builder()
+				.email("test@gmail.com")
+				.password(passwordEncoder.encode("pass"))
+				.nickname("기본 유저")
+				.roles(Set.of(role))
+				.build();
+		
+		userRepository.save(user);
+	}
+
+	private void createRole(String roleName) {
+		if ( ! roleRepository.existsByRoleName(roleName) ) {
+			roleRepository.save( Role.builder().roleName(roleName).build() );
+			System.out.println("[RoleInitializer] 생성됨: " + roleName);
+		}
+			
+//		roleRepository.findByRoleName(roleName)
+//		.orElseGet( 
+//				() -> roleRepository.save( Role.builder().roleName(roleName).build() )
+//		);
+		
+	}
+	
+}

@@ -10,20 +10,25 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class UserResponse {
+public class UserMeResponse {
 	
 	private Long id;
-	private String email;
-	private String nickname;
-	private Set<Role> roles;
 	
-	public static UserResponse from(User user) {
-		return UserResponse.builder()
+	private String email;
+	
+	private String nickname;
+	
+	private Set<String> roles;
+
+	
+	public static UserMeResponse from(User user) {
+		return UserMeResponse.builder()
 				.id(user.getId())
 				.email(user.getEmail())
 				.nickname(user.getNickname())
-				.roles(user.getRoles())
+//				.roles(user.getRoles())
 				.build();
 	}
-
+	
+	
 }
