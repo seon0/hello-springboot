@@ -8,7 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.example.demo.basic.dto.ResponseDto;
+import com.example.demo.dto.ResponseDto;
 
 import jakarta.servlet.http.HttpServletRequest;
 

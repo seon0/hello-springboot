@@ -13,16 +13,16 @@ public class PostResponse {
 	private Long id;
 	private String title;
 	private String content;
-	private Long writerId;
-	private String writerUsername;
+	private Long userId;
+	private String userNickname;
 	
 	public static PostResponse from(Post post) {
 		return new PostResponse(
 				post.getId(),
 				post.getTitle(),
 				post.getContent(),
-				post.getWriter().getId(),
-				post.getWriter().getUsername()
+				post.getUser().getId(),
+				post.getUser().getUsername()
 		);
 	}
 

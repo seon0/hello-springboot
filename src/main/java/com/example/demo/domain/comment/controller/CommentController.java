@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.basic.dto.ResponseDto;
 import com.example.demo.domain.comment.dto.CommentCreateRequest;
 import com.example.demo.domain.comment.dto.CommentResponse;
 import com.example.demo.domain.comment.dto.CommentUpdateRequest;
 import com.example.demo.domain.comment.service.CommentService;
+import com.example.demo.dto.ResponseDto;
 import com.example.demo.global.jwt.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;

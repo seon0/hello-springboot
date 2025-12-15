@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.basic.dto.ResponseDto;
 import com.example.demo.domain.role.entity.Role;
 import com.example.demo.domain.role.repositoty.RoleRepository;
 import com.example.demo.domain.user.controller.UserController;
@@ -22,6 +21,7 @@ import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.exception.DuplicateUserException;
 import com.example.demo.domain.user.exception.UserNotFoundException;
 import com.example.demo.domain.user.repository.UserRepository;
+import com.example.demo.dto.ResponseDto;
 import com.example.demo.global.error.CustomException;
 import com.example.demo.global.error.ErrorCode;
 import com.example.demo.global.error.NotFoundException;

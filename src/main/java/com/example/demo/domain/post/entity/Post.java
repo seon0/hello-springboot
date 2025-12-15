@@ -40,13 +40,19 @@ public class Post {
 	// 작성자(User)와 관계 ( N:1 )
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
-	private User writer;
+	private User user;
 
 	@Column
 	private LocalDateTime createdAt;
 	
 	@Column
 	private LocalDateTime updatedAt;
+	
+	@Column(nullable = false)
+	private int viewCount;
+	
+	@Column(nullable = false)
+	private int likeCount;
 	
 	@PrePersist
 	public void onCreate() {

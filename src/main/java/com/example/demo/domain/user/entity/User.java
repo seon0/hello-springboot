@@ -60,16 +60,18 @@ public class User implements UserDetails{
 	private String nickname;
 	
 	
-//	@JoinTable(
-//			name = "user_role",
-//			joinColumns = @JoinColumn(name = "user_id"),
-//			inverseJoinColumns = @JoinColumn(name = "role_id")
-//	)
-//	@ManyToMany(fetch = FetchType.EAGER)
-	@ElementCollection(fetch = FetchType.EAGER)
-	@Enumerated(EnumType.STRING)
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(
+			name = "user_role",
+			joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "role_id")
+	)
+	@Builder.Default
 	private Set<Role> roles = new HashSet<>();
-//	private Set<Role> roles;
+	
+//	@ElementCollection(fetch = FetchType.EAGER)
+//	@Enumerated(EnumType.STRING)
+//	private Set<Role> roles = new HashSet<>();
 	
 	@Column(nullable = false)
 	private boolean deleted = false;
@@ -84,7 +86,7 @@ public class User implements UserDetails{
 		this.modifiedAt = LocalDateTime.now();
 		if ( roles == null || roles.isEmpty() ) {
 			roles = new HashSet<>();
-			roles.add(new Role(1L,"ROLE_USER"));
+			roles.add(Role.builder().id(1L).roleName("ROLE_USER").build());
 		}
 		
 //		if ( this.deleted == false) this.deleted = false;
@@ -99,9 +101,9 @@ public class User implements UserDetails{
 		this.roles.add(role);
 	}
 	
-	public void setRoles(Set<Role> roles) {
-		this.roles = roles;
-	}
+//	public void setRoles(Set<Role> roles) {
+//		this.roles = roles;
+//	}
 	
 	public void softDelete() {
 		this.deleted = true;

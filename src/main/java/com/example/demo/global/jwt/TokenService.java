@@ -18,7 +18,7 @@ public class TokenService {
 	
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UserRepository userRepository;
-	private PasswordEncoder passwordEncoder;
+	private final PasswordEncoder passwordEncoder;
 	
 	/*
 	 * Header에서 Authorization 값을 꺼내 유저 반환
@@ -57,6 +57,9 @@ public class TokenService {
 		User user = userRepository.findByEmailAndDeletedFalse(req.getEmail())
 				.orElseThrow( () -> new UnauthorizedException("잘못된 이메일 입니다."));
 		
+		System.out.println("[TokenService - login] req.getPassword: "+ req.getPassword());
+		System.out.println("[TokenService - login] user.getPassword: "+ user.getPassword());
+		System.out.println("[TokenService - login] matches: "+ (passwordEncoder.matches(req.getPassword(), user.getPassword())) );
 		if ( ! passwordEncoder.matches(req.getPassword(), user.getPassword()) ) {
 			throw new UnauthorizedException("잘못된 이메일 또는 비밀번호입니다.");
 		}

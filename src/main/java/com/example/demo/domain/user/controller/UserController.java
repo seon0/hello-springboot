@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.basic.dto.ResponseDto;
 import com.example.demo.domain.user.dto.UserLoginRequest;
 import com.example.demo.domain.user.dto.UserLoginResponse;
 import com.example.demo.domain.user.dto.UserMeResponse;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.dto.UserJoinRequest;
 import com.example.demo.domain.user.service.UserService;
+import com.example.demo.dto.ResponseDto;
 import com.example.demo.global.util.SecurityUtil;
 
 import jakarta.validation.Valid;

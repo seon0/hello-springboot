@@ -2,19 +2,23 @@ package com.example.demo.domain.post.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.basic.dto.ResponseDto;
 import com.example.demo.domain.like.repository.LikeRepository;
 import com.example.demo.domain.post.dto.PostDetailResponse;
 import com.example.demo.domain.post.dto.PostRequestDto;
 import com.example.demo.domain.post.dto.PostResponse;
+import com.example.demo.domain.post.dto.PostSearchCondition;
 import com.example.demo.domain.post.dto.PostUpdateRequest;
 import com.example.demo.domain.post.entity.Post;
+import com.example.demo.domain.post.repository.PostQueryRepository;
 import com.example.demo.domain.post.repository.PostRepository;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.repository.UserRepository;
+import com.example.demo.dto.ResponseDto;
 import com.example.demo.global.jwt.TokenService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +31,7 @@ public class PostService {
 	private final UserRepository userRepository;
 	private final LikeRepository likeRepository;
 	private final TokenService tokenService;
+	private final PostQueryRepository postQueryRepository;
 	
 	public Post createPost(String token, PostRequestDto dto) {
 		User user = tokenService.getUserFromToken(token);
@@ -34,7 +39,7 @@ public class PostService {
 		Post post = Post.builder()
 							.title(dto.getTitle())
 							.content(dto.getContent())
-							.writer(user)
+							.user(user)
 							.build();
 		
 		postRepository.save(post);
@@ -108,10 +113,25 @@ public class PostService {
 
 	
 	public void validateOwner(Long userId, Post post) {
-		if ( ! post.getWriter().getId().equals(userId) ) {
+		if ( ! post.getUser().getId().equals(userId) ) {
 			throw new RuntimeException("게시글 작성자만 수정/삭제할 수 있습니다.");
 		}
 	}
 
+	
+	public Page<PostResponse> search(PostSearchCondition cond, Pageable pageable) {
+		Page<Post> posts = postQueryRepository.search(cond, pageable);
+		return posts.map(PostResponse::from);
+	}
+	
 
+	public List<Post> searchPosts(PostSearchCondition condition, Long userId) {
+		return postQueryRepository.searchPosts(condition, userId);
+	}
+
+	public Page<PostResponse> searchFinal(PostSearchCondition cond, Pageable pageable, Long userId) {
+		return postQueryRepository
+				.searchFinal(cond, userId, pageable)
+				.map(PostResponse::from);
+	}
 }
