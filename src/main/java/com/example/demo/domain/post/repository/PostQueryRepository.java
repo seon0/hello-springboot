@@ -33,36 +33,36 @@ public class PostQueryRepository {
 
 	private final JPAQueryFactory query;
 	
-	public Page<Post> search(PostSearchCondition cond, Pageable pageable) {
-		QPost post = QPost.post;
-		QUser user = QUser.user;
-		List<Post> result = query
-				.selectFrom(post)
-				.leftJoin(post.user, user).fetchJoin()
-				.where(
-						titleContains(post, cond.getTitle()),
-						contentContains(post, cond.getContent()),
-						nicknameEq(post, cond.getNickname()),
-						dateBetween(post, cond.getFromDate(), cond.getToDate())
-				)
-				.offset(pageable.getOffset())
-				.limit(pageable.getPageSize())
-				.orderBy(post.id.desc())
-				.fetch();
-				
-		long total =query
-				.select(post.count())
-				.from(post)
-				.where( 
-						titleContains(post, cond.getTitle()),
-						contentContains(post, cond.getContent()),
-						nicknameEq(post, cond.getNickname()),
-						dateBetween(post, cond.getFromDate(), cond.getToDate())
-				)
-				.fetchOne();
-				
-		return new PageImpl<>(result, pageable, total);
-	}
+//	public Page<Post> search(PostSearchCondition cond, Pageable pageable) {
+//		QPost post = QPost.post;
+//		QUser user = QUser.user;
+//		List<Post> result = query
+//				.selectFrom(post)
+//				.leftJoin(post.user, user).fetchJoin()
+//				.where(
+//						titleContains(post, cond.getTitle()),
+//						contentContains(post, cond.getContent()),
+//						nicknameEq(post, cond.getNickname()),
+//						dateBetween(post, cond.getFromDate(), cond.getToDate())
+//				)
+//				.offset(pageable.getOffset())
+//				.limit(pageable.getPageSize())
+//				.orderBy(post.id.desc())
+//				.fetch();
+//				
+//		long total =query
+//				.select(post.count())
+//				.from(post)
+//				.where( 
+//						titleContains(post, cond.getTitle()),
+//						contentContains(post, cond.getContent()),
+//						nicknameEq(post, cond.getNickname()),
+//						dateBetween(post, cond.getFromDate(), cond.getToDate())
+//				)
+//				.fetchOne();
+//				
+//		return new PageImpl<>(result, pageable, total);
+//	}
 
 	
 	private BooleanExpression titleContains(QPost post,String title) {
@@ -99,57 +99,57 @@ public class PostQueryRepository {
 	
 	
 
-	public List<Post> searchPosts(PostSearchCondition cond, Long userId) {
-		QPost post = QPost.post;
-		QUser user = QUser.user;
-		BooleanBuilder builder = new BooleanBuilder();
-		
-
-//		---------- 기본 조건 ----------
-		if ( cond.getOnlyActive() == null || cond.getOnlyActive() ) {
-//			deleted == false 조건 넣고 싶다면 여기에서!
-//			builder.and(post.deleted.eq(false));
-		}
-		
-		// 제목 검색
-		if ( cond.getTitle() != null  && ! cond.getTitle().isBlank() ) {
-			builder.and( post.title.containsIgnoreCase(cond.getTitle()) );
-		}
-
-		// 내용 검색
-		if ( cond.getContent() != null  && ! cond.getContent().isBlank() ) {
-			builder.and( post.content.containsIgnoreCase(cond.getContent()) );
-		}
-		
-		// 작성자 검색
-		if ( cond.getNickname() != null && ! cond.getNickname().isBlank() ) {
-			builder.and( post.user.nickname.containsIgnoreCase(cond.getNickname()) );
-		}
-		
-		// 통합 검색
-		if ( cond.getKeyword() != null && ! cond.getKeyword().isBlank() ) {
-			String k = cond.getKeyword();
-			builder.and(
-					post.title.containsIgnoreCase(k)
-								.or(post.content.containsIgnoreCase(k))
-								.or(post.user.nickname.containsIgnoreCase(k))
-			);
-		}
-		
-		// 내가 쓴 글만
-		if ( cond.getOnlyMine() != null && cond.getOnlyMine() ) {
-			builder.and(post.user.id.eq(userId));
-		}
-		
-		// 정렬
-		List<OrderSpecifier<?>> orders = createOrderSpecifiers(cond.getOrder(), post, user);
-		
-		return query.selectFrom(post)
-						.leftJoin(post.user, user).fetchJoin()
-						.where(builder)
-						.orderBy(orders.toArray(new OrderSpecifier[0]))
-						.fetch();
-	}
+//	public List<Post> searchPosts(PostSearchCondition cond, Long userId) {
+//		QPost post = QPost.post;
+//		QUser user = QUser.user;
+//		BooleanBuilder builder = new BooleanBuilder();
+//		
+//
+////		---------- 기본 조건 ----------
+//		if ( cond.getOnlyActive() == null || cond.getOnlyActive() ) {
+////			deleted == false 조건 넣고 싶다면 여기에서!
+////			builder.and(post.deleted.eq(false));
+//		}
+//		
+//		// 제목 검색
+//		if ( cond.getTitle() != null  && ! cond.getTitle().isBlank() ) {
+//			builder.and( post.title.containsIgnoreCase(cond.getTitle()) );
+//		}
+//
+//		// 내용 검색
+//		if ( cond.getContent() != null  && ! cond.getContent().isBlank() ) {
+//			builder.and( post.content.containsIgnoreCase(cond.getContent()) );
+//		}
+//		
+//		// 작성자 검색
+//		if ( cond.getNickname() != null && ! cond.getNickname().isBlank() ) {
+//			builder.and( post.user.nickname.containsIgnoreCase(cond.getNickname()) );
+//		}
+//		
+//		// 통합 검색
+//		if ( cond.getKeyword() != null && ! cond.getKeyword().isBlank() ) {
+//			String k = cond.getKeyword();
+//			builder.and(
+//					post.title.containsIgnoreCase(k)
+//								.or(post.content.containsIgnoreCase(k))
+//								.or(post.user.nickname.containsIgnoreCase(k))
+//			);
+//		}
+//		
+//		// 내가 쓴 글만
+//		if ( cond.getOnlyMine() != null && cond.getOnlyMine() ) {
+//			builder.and(post.user.id.eq(userId));
+//		}
+//		
+//		// 정렬
+//		List<OrderSpecifier<?>> orders = createOrderSpecifiers(cond.getOrder(), post, user);
+//		
+//		return query.selectFrom(post)
+//						.leftJoin(post.user, user).fetchJoin()
+//						.where(builder)
+//						.orderBy(orders.toArray(new OrderSpecifier[0]))
+//						.fetch();
+//	}
 	
 	
 	private List<OrderSpecifier<?>> createOrderSpecifiers(SearchOrder order, QPost post, QUser user) {

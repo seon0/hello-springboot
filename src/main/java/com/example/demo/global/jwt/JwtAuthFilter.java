@@ -11,7 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.repository.UserRepository;
-import com.example.demo.global.error.UnauthorizedException;
+import com.example.demo.global.exception.UnauthorizedException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -59,7 +59,7 @@ public class JwtAuthFilter extends OncePerRequestFilter{
 				}
 				
 			} catch (Exception e) {
-				log.warn("JWT 인증 실패: {}", e.getMessage());
+				log.warn("[JwtAuthFilter-doFilterInternal] JWT 인증 실패: {}", e.getMessage());
 				throw new UnauthorizedException("유효하지 않은 토큰입니다.");
 			}
 		}

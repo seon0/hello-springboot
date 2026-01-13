@@ -1,7 +1,5 @@
 package com.example.demo.domain.user.controller;
 
-import java.util.Map;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,37 +9,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.domain.user.dto.UserJoinRequest;
 import com.example.demo.domain.user.dto.UserLoginRequest;
 import com.example.demo.domain.user.dto.UserLoginResponse;
-import com.example.demo.domain.user.dto.UserMeResponse;
 import com.example.demo.domain.user.entity.User;
-import com.example.demo.domain.user.dto.UserJoinRequest;
 import com.example.demo.domain.user.service.UserService;
-import com.example.demo.dto.ResponseDto;
 import com.example.demo.global.util.SecurityUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserController {
-	
+
 	private final UserService userService;
+
 	
 	@PostMapping("/join")
-	public ResponseEntity<?> register(@Valid @RequestBody UserJoinRequest req)  {
-		System.out.println("register:: email- "+req.getEmail() + ", nickname:" + req.getNickname());
+	public ResponseEntity<?> join(@Valid @RequestBody UserJoinRequest req)  {
+		log.info("[UserController - join] req info:: email- "+req.getEmail() + ", nickname:" + req.getNickname());
 		userService.join(req);
 		return ResponseEntity.ok("회원가입 완료");
-//		return ResponseDto.success(userService.join(req));
 	}
 	
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@Valid @RequestBody UserLoginRequest req) {
 		UserLoginResponse res = userService.login(req);
-//		String token = userService.login(req.getEmail(), req.getPassword());
+		
 		return ResponseEntity.ok(res);
 	}
 	
@@ -51,8 +50,7 @@ public class UserController {
 		if ( loginUserId == null ) {
 			return ResponseEntity.status(401).build();
 		}
-		UserMeResponse res = userService.me(loginUserId);
-		return ResponseEntity.ok(res);
+		return ResponseEntity.ok(userService.me(loginUserId));
 	}
 	
 	/* Controller에서 UserId 읽는법 1 */
@@ -67,5 +65,16 @@ public class UserController {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		return (Long) auth.getPrincipal();
 	}
+	
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout(HttpServletRequest req) {
+		userService.logout(req);
+		return ResponseEntity.ok().build();
+	}
 
+	@PostMapping("/refresh")
+	public ResponseEntity<?> refresh(HttpServletRequest req) {
+		return ResponseEntity.ok(userService.refresh(req));
+
+	}
 }

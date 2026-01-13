@@ -1,4 +1,4 @@
-package com.example.demo.global.error;
+package com.example.demo.global.exception;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -56,6 +56,7 @@ public class GlobalExceptionHandler {
 			return null;
 		}
 		
+		e.printStackTrace();
 //		return ResponseDto.fail("서버 오류:" + e.getMessage());
 		return ResponseEntity
 						.status(500)

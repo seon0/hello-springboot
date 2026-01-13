@@ -3,11 +3,13 @@ package com.example.demo.global.jwt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.domain.user.dto.TokenResponse;
 import com.example.demo.domain.user.dto.UserLoginRequest;
 import com.example.demo.domain.user.dto.UserLoginResponse;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.repository.UserRepository;
-import com.example.demo.global.error.UnauthorizedException;
+import com.example.demo.global.exception.UnauthorizedException;
+import com.example.demo.global.redis.TokenRedisService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,8 @@ public class TokenService {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+	
+	private final TokenRedisService tokenRedisService;
 	
 	/*
 	 * Header에서 Authorization 값을 꺼내 유저 반환
@@ -64,8 +68,27 @@ public class TokenService {
 			throw new UnauthorizedException("잘못된 이메일 또는 비밀번호입니다.");
 		}
 		
-		String token = jwtTokenProvider.createToken(user.getId());
-		
+		String token = createToken(user.getId());
 		return new UserLoginResponse(user.getId(), user.getNickname(), token, "Bearer " + token);
+	}
+	
+	
+	public TokenResponse refresh(String token) {
+		Long userId = tokenRedisService.getUserIdByToken(token);
+		
+		if ( userId == null ) {
+			throw new UnauthorizedException();
+		}
+		
+		String refreshToken = createToken(userId);
+		return new TokenResponse(refreshToken);
+	}
+	
+	
+	
+	public String createToken(Long userId) {
+		String token = jwtTokenProvider.createToken(userId);
+		tokenRedisService.saveRefreshToken(token, userId);
+		return token;
 	}
 }

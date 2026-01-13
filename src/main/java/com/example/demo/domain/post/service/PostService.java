@@ -18,23 +18,29 @@ import com.example.demo.domain.post.repository.PostQueryRepository;
 import com.example.demo.domain.post.repository.PostRepository;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.repository.UserRepository;
+import com.example.demo.domain.user.service.UserService;
 import com.example.demo.dto.ResponseDto;
 import com.example.demo.global.jwt.TokenService;
+import com.example.demo.global.redis.PostRedisService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
 	
 	private final PostRepository postRepository;
-	private final UserRepository userRepository;
 	private final LikeRepository likeRepository;
 	private final TokenService tokenService;
 	private final PostQueryRepository postQueryRepository;
-	
-	public Post createPost(String token, PostRequestDto dto) {
-		User user = tokenService.getUserFromToken(token);
+	private final PostRedisService postRedisService;
+	private final UserService userService;
+
+	@Transactional
+	public Post createPost(Long userId, PostRequestDto dto) {
+		User user = userService.getUserById(userId);
 		
 		Post post = Post.builder()
 							.title(dto.getTitle())
@@ -49,16 +55,38 @@ public class PostService {
 	}
 	
 	
+	@Transactional(readOnly = true)
 	public ResponseDto<?> getPost(Long id, Long userId) {
+		
+		try {
+			PostDetailResponse cachedPost = postRedisService.getPost(id);
+			System.out.println("[PostController - getPost] cachedPost: "+cachedPost);
+			if ( cachedPost != null ) {
+//			return ResponseDto.success( PostDetailResponse.from(cachedPost, (long)cachedPost.getLikeCount(), false) );
+				return ResponseDto.success(cachedPost);
+			}
+		} catch (Exception e) {
+			log.warn("[PostService - getPost] Redis get failed. fallback to DB. postId={}", id);
+		}
+		
+		
 		Post post = findPostByIdOrThrow(id);
 
 		long likeCount = likeRepository.countByPost(post);
+		post.setLikeCount((int) likeCount);
 		boolean likedByMe = false;
 		if ( userId != null ) {
 			likedByMe = likeRepository.existsByUserAndPost(User.builder().id(userId).build(), post);
 		}
 		
-		return ResponseDto.success(PostDetailResponse.from(post, likeCount, likedByMe));
+		PostDetailResponse res = PostDetailResponse.from(post, likeCount, likedByMe);
+		try {
+			postRedisService.savePost(res);
+		} catch (Exception e) {
+			log.warn("[PostService - getPost] Redis save failed. ignore. postId={}", id);
+		}
+		
+		return ResponseDto.success(res);
 	}
 
 	public ResponseDto<?> getPosts() {
@@ -72,8 +100,8 @@ public class PostService {
 	}
 	
 	@Transactional
-	public ResponseDto<?> updatePost(String token, Long id, PostUpdateRequest dto) {
-		User user = tokenService.getUserFromToken(token);
+	public ResponseDto<?> updatePost(Long userId, Long id, PostUpdateRequest dto) {
+		User user = userService.getUserById(userId);
 		
 		Post post = findPostByIdOrThrow(id);
 		
@@ -84,6 +112,9 @@ public class PostService {
 
 		
 		postRepository.save(post);
+		try {
+			postRedisService.deletePost(post.getId());
+		} catch (Exception e) { }
 		
 		long likeCount = likeRepository.countByPost(post);
 		boolean likedByMe = likeRepository.existsByUserAndPost(user, post);
@@ -92,13 +123,16 @@ public class PostService {
 	
 
 	@Transactional
-	public ResponseDto<?> deletePost(String token, Long id) {
-		User user = tokenService.getUserFromToken(token);
+	public ResponseDto<?> deletePost(Long userId, Long id) {
+		User user = userService.getUserById(userId);
 		
 		Post post = findPostByIdOrThrow(id);
 		validateOwner(user.getId(), post);
 		
 		postRepository.delete(post);
+		try {
+			postRedisService.deletePost(post.getId());
+		} catch (Exception e) { }
 		
 		return ResponseDto.success("삭제 완료");
 	}
@@ -119,15 +153,15 @@ public class PostService {
 	}
 
 	
-	public Page<PostResponse> search(PostSearchCondition cond, Pageable pageable) {
-		Page<Post> posts = postQueryRepository.search(cond, pageable);
-		return posts.map(PostResponse::from);
-	}
-	
-
-	public List<Post> searchPosts(PostSearchCondition condition, Long userId) {
-		return postQueryRepository.searchPosts(condition, userId);
-	}
+//	public Page<PostResponse> search(PostSearchCondition cond, Pageable pageable) {
+//		Page<Post> posts = postQueryRepository.search(cond, pageable);
+//		return posts.map(PostResponse::from);
+//	}
+//	
+//
+//	public List<Post> searchPosts(PostSearchCondition condition, Long userId) {
+//		return postQueryRepository.searchPosts(condition, userId);
+//	}
 
 	public Page<PostResponse> searchFinal(PostSearchCondition cond, Pageable pageable, Long userId) {
 		return postQueryRepository

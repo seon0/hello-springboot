@@ -1,6 +1,6 @@
 package com.example.demo.domain.user.exception;
 
-import com.example.demo.global.error.NotFoundException;
+import com.example.demo.global.exception.NotFoundException;
 
 public class UserNotFoundException extends NotFoundException{
 

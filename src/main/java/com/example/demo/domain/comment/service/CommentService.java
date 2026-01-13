@@ -3,6 +3,7 @@ package com.example.demo.domain.comment.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.domain.comment.dto.CommentCreateRequest;
 import com.example.demo.domain.comment.dto.CommentResponse;
@@ -13,8 +14,9 @@ import com.example.demo.domain.post.entity.Post;
 import com.example.demo.domain.post.repository.PostRepository;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.repository.UserRepository;
-import com.example.demo.global.error.NotFoundException;
-import com.example.demo.global.error.UnauthorizedException;
+import com.example.demo.global.exception.NotFoundException;
+import com.example.demo.global.exception.UnauthorizedException;
+import com.example.demo.global.redis.PostRedisService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +27,7 @@ public class CommentService {
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
 	private final CommentRepository commentRepository;
+	private final PostRedisService postRedisService;
 
 	public List<CommentResponse> getComments(Long postId) {
 		
@@ -42,7 +45,7 @@ public class CommentService {
 				.toList();
 	}
 
-//	@Transactional
+	@Transactional
 	public CommentResponse createComment(Long postId, Long userId, CommentCreateRequest request) {
 		
 		
@@ -58,6 +61,7 @@ public class CommentService {
 				.content(request.getContent())
 				.build();
 		commentRepository.save(comment);
+		deletePostAtRedis(comment.getPost().getId());
 		
 		return CommentResponse.builder()
 				.id(comment.getId())
@@ -66,7 +70,8 @@ public class CommentService {
 				.authorName(user.getUsername())
 				.build();
 	}
-	
+
+	@Transactional
 	public CommentResponse updateComment(Long id, Long userId, CommentUpdateRequest request) {
 		
 		Comment comment = commentRepository.findById(id)
@@ -78,6 +83,7 @@ public class CommentService {
 		
 		comment.setContent(request.getContent());
 		commentRepository.save(comment);
+		deletePostAtRedis(comment.getPost().getId());
 		
 		return CommentResponse.builder()
 				.id(comment.getId())
@@ -87,7 +93,7 @@ public class CommentService {
 				.build();
 	}
 
-//	@Transactional
+	@Transactional
 	public void deleteComment(Long id, Long userId) {
 		
 		Comment comment = commentRepository.findById(id)
@@ -98,13 +104,15 @@ public class CommentService {
 		}
 		
 		commentRepository.delete(comment);
+		deletePostAtRedis(comment.getPost().getId());
+	}
+
+	
+	private void deletePostAtRedis(Long postId) {
+		try {
+			postRedisService.deletePost(postId);
+		} catch (Exception e) { }
 	}
 	
 	
-	
-//
-//	private Long extractUserId(String token) {
-//		token = token.replace("Bearer ", "");
-//		return jwtTokenProvider.validateAndGetUserId(token);
-//	}
 }

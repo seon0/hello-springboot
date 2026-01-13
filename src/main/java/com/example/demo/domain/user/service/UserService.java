@@ -14,6 +14,7 @@ import com.example.demo.domain.role.repositoty.RoleRepository;
 import com.example.demo.domain.user.controller.UserController;
 import com.example.demo.domain.user.dto.UserLoginRequest;
 import com.example.demo.domain.user.dto.UserLoginResponse;
+import com.example.demo.domain.user.dto.TokenResponse;
 import com.example.demo.domain.user.dto.UserJoinRequest;
 import com.example.demo.domain.user.dto.UserMeResponse;
 import com.example.demo.domain.user.dto.UserResponse;
@@ -22,12 +23,15 @@ import com.example.demo.domain.user.exception.DuplicateUserException;
 import com.example.demo.domain.user.exception.UserNotFoundException;
 import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.dto.ResponseDto;
-import com.example.demo.global.error.CustomException;
-import com.example.demo.global.error.ErrorCode;
-import com.example.demo.global.error.NotFoundException;
+import com.example.demo.global.exception.CustomException;
+import com.example.demo.global.exception.ErrorCode;
+import com.example.demo.global.exception.NotFoundException;
+import com.example.demo.global.exception.UnauthorizedException;
 import com.example.demo.global.jwt.JwtTokenProvider;
 import com.example.demo.global.jwt.TokenService;
+import com.example.demo.global.redis.TokenRedisService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -38,8 +42,8 @@ public class UserService {
 	private final RoleRepository roleRepository;
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
-//	private final JwtTokenProvider jwtTokenProvider;
 	private final TokenService tokenService;
+	private final TokenRedisService tokenRedisService;
 
 	
 	@Transactional
@@ -104,13 +108,37 @@ public class UserService {
 					.map(Role::getRoleName)
 					.collect(Collectors.toSet());
 		
-//		return UserMeResponse.builder()
-//				.id(user.getId())
-//				.email(user.getEmail())
-//				.nickname(user.getNickname())
-//				.roles(roles)
-//				.build();
 		return UserMeResponse.from(user);
+	}
+	
+	public void logout(HttpServletRequest req) {
+		String token = getTokenFromHttpServletRequestHeader(req);
+		tokenRedisService.delete(token);
+	}
+
+	public Object refresh(HttpServletRequest req) {
+		String token = getTokenFromHttpServletRequestHeader(req);
+		Long userId = tokenRedisService.getUserIdByToken(token);
+		
+		if ( userId == null ) {
+			throw new UnauthorizedException();
+		}
+		
+		String newAccessToken = tokenService.createToken(userId);
+		return new TokenResponse(newAccessToken);
+	}
+	
+	
+	private String getTokenFromHttpServletRequestHeader(HttpServletRequest req) {
+		String token = req.getHeader("Authorized");
+		return token.replace("Bearer ", "");
+	}
+	
+	
+	public User getUserById(Long id) {
+		User user = userRepository.findById(id).orElseThrow(
+				 () -> new NotFoundException("유저를 찾을 수 없습니다."));
+		return user;
 	}
 	
 }

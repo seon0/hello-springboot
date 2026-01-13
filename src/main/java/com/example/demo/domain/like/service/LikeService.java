@@ -1,6 +1,7 @@
 package com.example.demo.domain.like.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.domain.like.entity.Like;
 import com.example.demo.domain.like.repository.LikeRepository;
@@ -8,7 +9,8 @@ import com.example.demo.domain.post.entity.Post;
 import com.example.demo.domain.post.repository.PostRepository;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.repository.UserRepository;
-import com.example.demo.global.error.NotFoundException;
+import com.example.demo.global.exception.NotFoundException;
+import com.example.demo.global.redis.PostRedisService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,7 +21,9 @@ public class LikeService {
 	private final LikeRepository likeRepository;
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
-	
+	private final PostRedisService postRedisService;
+
+	@Transactional
 	public boolean toggleLike(Long postId, Long userId) {
 		Post post = postRepository.findById(postId)
 				.orElseThrow( () -> new NotFoundException("게시글을 찾을 수 없습니다.")) ;
@@ -31,6 +35,9 @@ public class LikeService {
 				.map( existingLike -> {
 					// 눌렀으면, 취소
 					likeRepository.delete(existingLike);
+					try {
+						postRedisService.deletePost(postId);
+					} catch (Exception e) { }
 					return false; // 좋아요 취소됨
 				})
 				.orElseGet( () -> {
@@ -39,6 +46,9 @@ public class LikeService {
 							.post(post)
 							.build();
 					likeRepository.save(newLike);
+					try {
+						postRedisService.deletePost(postId);
+					} catch (Exception e) { }
 					return true;
 				});
 		

@@ -1,7 +1,7 @@
 package com.example.demo.domain.user.exception;
 
-import com.example.demo.global.error.CustomException;
-import com.example.demo.global.error.ErrorCode;
+import com.example.demo.global.exception.CustomException;
+import com.example.demo.global.exception.ErrorCode;
 
 public class DuplicateUserException extends CustomException{
 

@@ -4,11 +4,15 @@ import java.time.LocalDateTime;
 
 import com.example.demo.domain.post.entity.Post;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PostDetailResponse {
 	private Long id;
 	private String title;
@@ -22,6 +26,10 @@ public class PostDetailResponse {
 	private boolean likedByMe;
 	
 	public static PostDetailResponse from(Post post, Long likeCount, boolean likedByMe) {
+		System.out.println(post.getUser().toString());
+		System.out.println(post.getUser().getEmail());
+		System.out.println(post.getUser().getUsername());
+		System.out.println(post.getUser().getId());
 		return PostDetailResponse.builder()
 				.id(post.getId())
 				.title(post.getTitle())

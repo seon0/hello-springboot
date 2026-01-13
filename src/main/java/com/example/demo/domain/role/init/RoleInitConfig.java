@@ -12,6 +12,7 @@ import com.example.demo.domain.role.entity.Role;
 import com.example.demo.domain.role.repositoty.RoleRepository;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.repository.UserRepository;
+import com.example.demo.global.redis.TokenRedisService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +25,8 @@ public class RoleInitConfig implements ApplicationRunner {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
+	private final TokenRedisService tokenRedisService;
+	
 	@Override
 	@Transactional
 	public void run(ApplicationArguments args) throws Exception {
@@ -38,6 +41,8 @@ public class RoleInitConfig implements ApplicationRunner {
 				.build();
 		
 		userRepository.save(user);
+		
+		tokenRedisService.test();
 	}
 
 	private void createRole(String roleName) {
