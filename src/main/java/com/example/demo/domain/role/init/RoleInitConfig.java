@@ -30,24 +30,27 @@ public class RoleInitConfig implements ApplicationRunner {
 	@Override
 	@Transactional
 	public void run(ApplicationArguments args) throws Exception {
-		createRole("ROLE_USER");
+		Role userRole = createRole("ROLE_USER");
 		createRole("ROLE_ADMIN");
-		Role role = new Role(1L, "ROLE_USER");
-		User user = User.builder()
-				.email("test@gmail.com")
-				.password(passwordEncoder.encode("pass"))
-				.nickname("기본 유저")
-				.roles(Set.of(role))
-				.build();
 		
-		userRepository.save(user);
+		if ( ! userRepository.existsByEmail("test@gmail.com") ) {
+			User user = User.builder()
+					.email("test@gmail.com")
+					.password(passwordEncoder.encode("pass"))
+					.nickname("기본 유저")
+					.roles(Set.of(userRole))
+					.build();
+			
+			userRepository.save(user);
+		}
 		
 		tokenRedisService.test();
 	}
 
-	private void createRole(String roleName) {
+	private Role createRole(String roleName) {
+		Role role = null;
 		if ( ! roleRepository.existsByRoleName(roleName) ) {
-			roleRepository.save( Role.builder().roleName(roleName).build() );
+			role= roleRepository.save( Role.builder().roleName(roleName).build() );
 			System.out.println("[RoleInitializer] 생성됨: " + roleName);
 		}
 			
@@ -55,7 +58,7 @@ public class RoleInitConfig implements ApplicationRunner {
 //		.orElseGet( 
 //				() -> roleRepository.save( Role.builder().roleName(roleName).build() )
 //		);
-		
+		return role;
 	}
 	
 }

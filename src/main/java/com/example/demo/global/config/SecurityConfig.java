@@ -1,18 +1,14 @@
 package com.example.demo.global.config;
 
-import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.demo.global.jwt.JwtAuthFilter;
 
@@ -25,10 +21,6 @@ public class SecurityConfig {
 	private final JwtAuthFilter jwtAuthFilter;
 	private final CorsConfig corsConfig;
 
-//	public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
-//		this.jwtAuthFilter = jwtAuthFilter;
-//	}
-	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
@@ -45,11 +37,18 @@ public class SecurityConfig {
 								"/swagger-ui/**",
 								"/swagger-resources/**",
 								"/swagger-resources",
-//								"/webjars/**",
 								"/swagger-ui.html"
 						).permitAll()
 						// 로그인/회원가입 허용
 						.requestMatchers("/api/users/login", "/api/users/join").permitAll()
+
+						.requestMatchers("/api/users/refresh").permitAll()
+						
+						.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+						
+						.requestMatchers("/health").permitAll()
+						.requestMatchers("/actuator/health").permitAll()
+						.requestMatchers("/actuator/info").permitAll()
 						
 						// 그 외는 인증 필요
 						.anyRequest().authenticated()

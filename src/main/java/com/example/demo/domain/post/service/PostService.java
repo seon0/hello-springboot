@@ -17,10 +17,8 @@ import com.example.demo.domain.post.entity.Post;
 import com.example.demo.domain.post.repository.PostQueryRepository;
 import com.example.demo.domain.post.repository.PostRepository;
 import com.example.demo.domain.user.entity.User;
-import com.example.demo.domain.user.repository.UserRepository;
 import com.example.demo.domain.user.service.UserService;
 import com.example.demo.dto.ResponseDto;
-import com.example.demo.global.jwt.TokenService;
 import com.example.demo.global.redis.PostRedisService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,7 +31,6 @@ public class PostService {
 	
 	private final PostRepository postRepository;
 	private final LikeRepository likeRepository;
-	private final TokenService tokenService;
 	private final PostQueryRepository postQueryRepository;
 	private final PostRedisService postRedisService;
 	private final UserService userService;
@@ -60,7 +57,6 @@ public class PostService {
 		
 		try {
 			PostDetailResponse cachedPost = postRedisService.getPost(id);
-			System.out.println("[PostController - getPost] cachedPost: "+cachedPost);
 			if ( cachedPost != null ) {
 //			return ResponseDto.success( PostDetailResponse.from(cachedPost, (long)cachedPost.getLikeCount(), false) );
 				return ResponseDto.success(cachedPost);

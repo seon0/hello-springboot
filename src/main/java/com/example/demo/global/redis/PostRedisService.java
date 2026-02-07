@@ -2,12 +2,11 @@ package com.example.demo.global.redis;
 
 import java.time.Duration;
 
-import org.springframework.beans.factory.annotation.Qualifier;
+//import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.post.dto.PostDetailResponse;
-import com.example.demo.domain.post.entity.Post;
 
 import lombok.RequiredArgsConstructor;
 
