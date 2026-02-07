@@ -29,9 +29,9 @@ services:
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: root 
-		# ${MYSQL_ROOT_PASSWORD}
+		#  ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: demo
-		# ${MYSQL_DATABASE}
+		#  ${MYSQL_DATABASE}
       MYSQL_USER: demo
       MYSQL_PASSWORD: demo
     ports:
