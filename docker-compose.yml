@@ -12,18 +12,33 @@ services:
       - ./nginx/letsencrypt:/etc/letsencrypt
     depends_on:
       - spring-api
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   certbot:
     image: certbot/certbot
     volumes:
       - ./nginx/certbot:/var/www/certbot
       - ./nginx/letsencrypt:/etc/letsencrypt
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   redis:
     image: redis:7
     container_name: redis
     ports:
       - "6379:6379"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   mysql:
     image: mysql:8.0
@@ -37,6 +52,11 @@ services:
       - "3306:3306"
     command:
       --innodb-buffer-pool-size=128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     volumes:
       - mysql-data:/var/lib/mysql
 
@@ -60,12 +80,11 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   mysql-data:
-
-logging:
-  driver: "json-file"
-  options:
-    max-size: "10m"
-    max-file: "3"
